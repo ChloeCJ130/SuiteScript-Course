@@ -1,6 +1,7 @@
 /**
  * @NApiVersion 2.x
  * @NScriptType ClientScript
+ * @NModuleScope SameAccount
  */
 define([],
 
@@ -32,23 +33,22 @@ function() {
      * @since 2015.2
      */
     function fieldChanged(context) {
-        //triggers when a field is changed
-        var employee = context.currentRecord;
+        var customer = context.currentRecord;
 
-        //add a filter to check which field is being changed
-        if (context.fieldId == 'phone'){
-            var fax = employee.getValue('fax');
-            //get the fax field value
+        if (context.fieldId == 'custentity_sdr_apply_coupon'){
+            //var couponCode = customer.getValue('custentity_sdr_coupon_code');
+            var applyCoupon = customer.getValue('custentity_sdr_apply_coupon');
 
-            if (!fax){
-                var phone = employee.getValue('phone');
-                //get the phone field value
+            var couponCode = customer.getField('custentity_sdr_coupon_code');
 
-                employee.setValue('fax', phone);
-                //set the fax field value to the phone field value
+            if (applyCoupon){
+                couponCode.isDisabled = false;
+            }
+            else {
+                customer.setValue('custentity_sdr_coupon_code', '');
+                couponCode.isDisabled = true;
             }
         }
-
     }
 
     /**
@@ -106,18 +106,7 @@ function() {
      * @since 2015.2
      */
     function validateField(context) {
-        var employee = context.currentRecord;
-        
-        if (context.fieldId == 'custentity_sdr_employee_code'){
-            var empCode = employee.getValue('custentity_sdr_employee_code');
-            //get the employee code field value
-            if (empCode == 'x'){
-                alert('Invalid Employee Code');
-                return false;
-                //return false to prevent the record from being saved
-            }
-        } 
-        return true;
+
     }
 
     /**
@@ -175,17 +164,7 @@ function() {
      * @since 2015.2
      */
     function saveRecord(context) {
-        var employee = context.currentRecord;
 
-        var empCode = employee.getValue('custentity_sdr_employee_code');
-        //get the employee code field value
-
-        if (empCode == 'x'){
-            alert('Invalid Employee Code');
-            return false;
-            //return false to prevent the record from being saved
-        }
-        return true;
     }
 
     return {
@@ -194,11 +173,11 @@ function() {
         //postSourcing: postSourcing,
         //sublistChanged: sublistChanged,
         //lineInit: lineInit,
-        validateField: validateField,
+        //validateField: validateField,
         //validateLine: validateLine,
         //validateInsert: validateInsert,
         //validateDelete: validateDelete,
-        saveRecord: saveRecord
+        //saveRecord: saveRecord
     };
     
 });
