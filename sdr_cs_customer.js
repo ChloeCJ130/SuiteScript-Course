@@ -17,7 +17,17 @@ function() {
      * @since 2015.2
      */
     function pageInit(context) {
+        var customer = context.currentRecord;
+        var applyCoupon = customer.getValue('custentity_sdr_apply_coupon');
+        var couponCode = customer.getField('custentity_sdr_coupon_code');
 
+        if (!applyCoupon){
+            couponCode.isDisabled = true;
+            customer.setValue('custentity_sdr_coupon_code', '');
+        }
+        else {
+            couponCode.isDisabled = false;
+        }
     }
 
     /**
@@ -36,7 +46,7 @@ function() {
         var customer = context.currentRecord;
 
         if (context.fieldId == 'custentity_sdr_apply_coupon'){
-            //var couponCode = customer.getValue('custentity_sdr_coupon_code');
+
             var applyCoupon = customer.getValue('custentity_sdr_apply_coupon');
 
             var couponCode = customer.getField('custentity_sdr_coupon_code');
@@ -106,7 +116,20 @@ function() {
      * @since 2015.2
      */
     function validateField(context) {
+        if (context.fieldId !== 'custentity_sdr_coupon_code'){
+            return true;
+        }
 
+        var customer = context.currentRecord;
+        var applyCoupon = customer.getValue('custentity_sdr_apply_coupon');
+        var couponCode = customer.getValue('custentity_sdr_coupon_code');
+
+        if (applyCoupon && couponCode.length < 5){
+            alert('Coupon Code must be at least 5 characters long.');
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -163,21 +186,33 @@ function() {
      *
      * @since 2015.2
      */
-    function saveRecord(context) {
 
+    function saveRecord(context) {
+    var customer = context.currentRecord;
+    var applyCoupon = customer.getValue('custentity_sdr_apply_coupon');
+    var couponCode = customer.getValue('custentity_sdr_coupon_code');
+
+    // Only check if apply coupon is checked
+    if (applyCoupon && (!couponCode || couponCode.length < 5)) {
+        alert('Coupon Code must be at least 5 characters long before saving.');
+        return false; // block save
     }
 
+    return true; // allow save
+    }
+
+
     return {
-        //pageInit: pageInit,
+        pageInit: pageInit,
         fieldChanged: fieldChanged,
         //postSourcing: postSourcing,
         //sublistChanged: sublistChanged,
         //lineInit: lineInit,
-        //validateField: validateField,
+        validateField: validateField,
         //validateLine: validateLine,
         //validateInsert: validateInsert,
         //validateDelete: validateDelete,
-        //saveRecord: saveRecord
+        saveRecord: saveRecord
     };
     
 });
