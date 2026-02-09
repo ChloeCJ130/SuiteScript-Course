@@ -8,14 +8,14 @@
 //use js dog tag to define the module
 //the 2 is required
 
-define([], 
+define(['N/redirect', 'N/record'], 
     
-    function () {
+    function (redirect, record) {
 
     return {
-        beforeLoad: function (context) {
+        aftersubmit: function (context) {
             //log.debug('Hello World');
-            var customer = context.newRecord;
+            /*var customer = context.newRecord;
 
             var cusID = customer.getText('entityid');
             var cusEmail = customer.getValue('email');
@@ -25,7 +25,23 @@ define([],
             log.audit('Customer ID', cusID);
             log.audit('Customer Email', cusEmail);
             log.audit('Sale Rep Name', salesRepName);
-            log.audit('Coupon Code', couponCode);
+            log.audit('Coupon Code', couponCode);*/
+
+            var customer = context.newRecord;
+
+            //will only trigger when a new customer is created
+            if (context.type == context.UserEventType.CREATE) {
+                redirect.toSuitelet({
+                    scriptId: '93',
+                    deploymentId: '1',
+                    parameters: {
+                        sdr_customerid: customer.id,
+                        sdr_phone: customer.getValue('phone'),
+                        sdr_email: customer.getValue('email'),
+                        sdr_salesrep_id: customer.getValue('salesrep')
+                    }
+                });
+            }
             
         }
     };
